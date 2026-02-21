@@ -6,7 +6,11 @@ package com.proterquim.inventarios.controller;
 
 import com.proterquim.inventarios.model.Producto;
 import com.proterquim.inventarios.service.ProductoService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,31 +31,52 @@ public class ProductoController {
      * Listar todos los productos
      */
     @GetMapping
-    public List<Producto> listarProductos() {
-        return productoService.listarProductos();
+    public ResponseEntity<List<Producto>> listarProductos() {
+        return ResponseEntity.ok(productoService.listarProductos());
     }
 
     /**
      * Crear un nuevo producto
      */
     @PostMapping
-    public Producto crearProducto(@RequestBody Producto producto) {
-        return productoService.guardarProducto(producto);
+    public ResponseEntity<Producto> crearProducto(@Valid @RequestBody Producto producto) {
+        Producto nuevoProducto = productoService.guardarProducto(producto);
+        return ResponseEntity.status(201).body(nuevoProducto);
     }
 
     /**
      * Buscar producto por ID
      */
     @GetMapping("/{id}")
-    public Optional<Producto> buscarProducto(@PathVariable Long id) {
-        return productoService.buscarPorId(id);
+    public ResponseEntity<Producto> buscarProducto(@PathVariable Long id) {
+        return productoService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Actualizar producto por ID
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Producto> actualizarProducto(
+            @PathVariable Long id,
+            @Valid @RequestBody Producto producto) {
+
+        return productoService.actualizarProducto(id, producto)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * Eliminar producto por ID
      */
     @DeleteMapping("/{id}")
-    public void eliminarProducto(@PathVariable Long id) {
-        productoService.eliminarProducto(id);
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+        if (productoService.buscarPorId(id).isPresent()) {
+            productoService.eliminarProducto(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
+

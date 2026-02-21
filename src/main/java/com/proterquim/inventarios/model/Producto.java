@@ -4,12 +4,8 @@
  */
 package com.proterquim.inventarios.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 /**
  * Entidad Producto
@@ -23,15 +19,22 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre no puede estar vacío")
+    @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Size(max = 255, message = "La descripción no puede superar 255 caracteres")
     @Column(length = 255)
     private String descripcion;
 
+    @NotNull(message = "El precio es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor que 0")
     @Column(nullable = false)
     private Double precio;
 
+    @NotNull(message = "El stock es obligatorio")
+    @Min(value = 0, message = "El stock no puede ser negativo")
     @Column(nullable = false)
     private Integer stock;
 
@@ -47,7 +50,10 @@ public class Producto {
         this.stock = stock;
     }
 
+    // ========================
     // Getters y Setters
+    // ========================
+
     public Long getId() {
         return id;
     }
@@ -88,3 +94,4 @@ public class Producto {
         this.stock = stock;
     }
 }
+
