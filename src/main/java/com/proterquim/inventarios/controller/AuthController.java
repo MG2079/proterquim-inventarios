@@ -34,13 +34,8 @@ public class AuthController {
 
         return "Error en la autenticación";
     }
+    
     // Servicio web para registrar un usuario
-
-    /**
-     *
-     * @param request
-     * @return
-     */
 @PostMapping("/registro")
 public String registro(@RequestBody RegisterRequest request) {
 
